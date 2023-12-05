@@ -34,15 +34,8 @@ int main()
                 for (auto j = 0; j < 9; j++) {
                     std::string &word = words[j];
                     std::string digit = "";
-                    auto k = i;
-                    for (; k < line.length() && (k - i) < word.length(); k++) {
-                        if (line.at(k) != word.at(k - i)) {
-                            break;
-                        }
-                        if ((k - i) == word.length() - 1) {
-                            digit = std::to_string(j + 1);
-                            break;
-                        }
+                    if (word == line.substr(i, i + word.length())) {
+                        digit = std::to_string(j + 1);
                     }
                     if (digit != "") {
                         last_pt2 = digit;
