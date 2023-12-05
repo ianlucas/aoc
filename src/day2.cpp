@@ -4,7 +4,8 @@
 #include <fstream>
 #include <iostream>
 
-class CStringParser {
+class CStringParser
+{
     public:
         std::string str;
         int len;
