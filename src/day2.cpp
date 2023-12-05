@@ -80,7 +80,6 @@ int main()
                             possible = false;
                         }
                         auto minimum_hand = minimum_bag.find(color);
-                        std::cout << game_id << ": " << quantity << " > " << minimum_hand->second << "\n";
                         if (quantity > minimum_hand->second) {
                             minimum_hand->second = quantity;
                         }
