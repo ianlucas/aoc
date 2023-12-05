@@ -12,10 +12,10 @@ int main()
         std::cout << "unable to open input file.\n";
         return 1;
     }
-    std::string schematic = "";
-    std::string line;
     int height = 0;
     int width = 0;
+    std::string line;
+    std::string schematic = "";
     while (std::getline(input_file, line)) {
         schematic += line;
         height += 1;
