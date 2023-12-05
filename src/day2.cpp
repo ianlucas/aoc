@@ -59,22 +59,30 @@ int main()
     }
     std::string line;
     int sum = 0;
+    int sum_pt2 = 0;
     while (std::getline(file_input, line)) {
         CStringParser parser(line);
         int game_id;
         bool possible = true;
+        std::unordered_map<std::string, int> minimum_bag = {
+            { "red", 0 },
+            { "green", 0 },
+            { "blue", 0 }
+        };
         if (parser.next_int(game_id)) {
             int quantity;
-            
             while (parser.next_int(quantity)) {
                 std::string color;
                 if (parser.next_word(color)) {
-                    auto from_bag = bag.find(color);
-                    if (from_bag != bag.end()) {
-                        std::cout << game_id << ": " << quantity << " > " << from_bag->second << "\n";
-                        if (quantity > from_bag->second) {
+                    auto hand = bag.find(color);
+                    if (hand != bag.end()) {
+                        if (quantity > hand->second) {
                             possible = false;
-                            break;
+                        }
+                        auto minimum_hand = minimum_bag.find(color);
+                        std::cout << game_id << ": " << quantity << " > " << minimum_hand->second << "\n";
+                        if (quantity > minimum_hand->second) {
+                            minimum_hand->second = quantity;
                         }
                     }
                 }
@@ -82,8 +90,14 @@ int main()
             if (possible) {
                 sum += game_id;
             }
+            int product = 1;
+            for (auto hand : minimum_bag) {
+                product *= hand.second;
+            }
+            sum_pt2 += product;
         }
     }
     std::cout << "sum is " << sum << "\n";
+    std::cout << "(part 2) sum is " << sum_pt2 << "\n";
     return 0;
 }
