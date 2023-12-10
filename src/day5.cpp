@@ -7,6 +7,7 @@
 #include <sstream>
 
 std::unordered_map<std::string, std::vector<std::vector<unsigned long>>> maps;
+std::vector<std::string> map_order = { "seed-to-soil", "soil-to-fertilizer", "fertilizer-to-water", "water-to-light", "light-to-temperature", "temperature-to-humidity", "humidity-to-location" };
 
 unsigned long lookup(std::string map_key, unsigned long source)
 {
@@ -96,19 +97,55 @@ int main()
     for (int i = 0; i < seeds.size(); i += 2) {
         auto start = seeds[i];
         auto length = seeds[i + 1];
-        std::cout << "looping through " << i << "th group...\n";
-        std::string last_print = "";
-        for (unsigned long j = 0; j < length; j++) {
-            auto seed = start + j;
-            auto location = get_seed_location(seed);
+        std::vector<std::vector<unsigned long>> source_ranges = { { start, start + length - 1} };
+        for (auto map_key : map_order) {
+            auto map = maps.find(map_key);
+            if (map == maps.end()) {
+                throw std::invalid_argument("map not found!");
+            }
+            auto ranges = source_ranges;
+            source_ranges.clear();
+            while (ranges.size() > 0) {
+                auto range = ranges.back();
+                ranges.pop_back();
+                auto start = range[0];
+                auto end = range[1];
+                auto length = end - start;
+                bool added_source_ranges = false; 
+                for (auto map_range : map->second) {
+                    auto destination_range_start = map_range[0];
+                    auto source_range_start = map_range[1];
+                    auto range_length = map_range[2];
+                    auto source_range_end = source_range_start + range_length - 1;
+                    auto destination_range_end = source_range_start + range_length - 1;
+                    if (start >= source_range_start && start < source_range_end) {
+                        auto start_offset = start - source_range_start;
+                        long end_diff = source_range_end - end;
+                        if (end_diff >= 0) {
+                            auto a = destination_range_start + start_offset;
+                            auto b = destination_range_start + start_offset + length;
+                            source_ranges.push_back({ a, b });
+                        } else {
+                            auto a = destination_range_start + start_offset;
+                            auto b = destination_range_start + start_offset + length + end_diff;
+                            source_ranges.push_back({ a, b });
+                            auto c = start + (b - a) + 1;
+                            auto d = end;
+                            ranges.push_back({ c, d });
+                        }
+                        added_source_ranges = true;
+                        break;
+                    }
+                }
+                if (!added_source_ranges) {
+                    source_ranges.push_back({ start, end });
+                }
+            }
+        }
+        for (auto range : source_ranges) {
+            auto location = range[0];
             if (lowest_location_pt2 == -1 || lowest_location_pt2 > location) {
                 lowest_location_pt2 = location;
-            }
-            std::ostringstream print_stream;
-            print_stream << "progress: " << (j * 100) / length << "\n";
-            if (print_stream.str() != last_print) {
-                last_print = print_stream.str();
-                std::cout << last_print;
             }
         }
     }
